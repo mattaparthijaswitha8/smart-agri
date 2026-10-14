@@ -1,0 +1,54 @@
+{% extends "base.html" %}{% block body %}
+<div class="card"><h2>Dataset overview</h2>
+<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
+<div class="stat"><div class="v">{{ '{:,}'.format(n) }}</div><div class="l">records</div></div>
+<div class="stat"><div class="v">{{ncrops}}</div><div class="l">crops</div></div>
+<div class="stat"><div class="v">{{nsoils}}</div><div class="l">soil types</div></div>
+<div class="stat"><div class="v">{{years}}</div><div class="l">years</div></div></div>
+<div class="scroll" style="margin-top:14px"><h3>Sample rows</h3>{{ sample_html|safe }}</div>
+<div class="scroll" style="margin-top:14px"><h3>Summary statistics</h3>{{ stats_html|safe }}</div></div>
+
+<div class="grid g2">
+ <div class="card"><h3>Records per crop</h3><img class="plot" src="/plot/crop_distribution.png"></div>
+ <div class="card"><h3>Correlation heat-map</h3><img class="plot" src="/plot/correlation.png"></div>
+ <div class="card"><h3>Crop patterns (rainfall vs temperature)</h3><img class="plot" src="/plot/scatter.png">
+  <div class="expl">Each colour is a crop: you can see which rainfall/temperature ranges suit which crop.</div></div>
+ <div class="card"><h3>Yield by crop</h3><img class="plot" src="/plot/yield_box.png"></div>
+</div>
+
+<div class="card"><h2>1 · Decision Tree (crop classification)</h2>
+ <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
+ <div class="stat"><div class="v">{{tree_acc}}%</div><div class="l">test accuracy</div></div>
+ <div class="stat"><div class="v">{{depth}}</div><div class="l">tree depth</div></div>
+ <div class="stat"><div class="v">{{leaves}}</div><div class="l">leaf nodes</div></div></div>
+ <img class="plot" src="/plot/tree.png" style="margin-top:14px">
+ <div class="grid g2" style="margin-top:14px">
+  <div><h3>Feature importance</h3><img class="plot" src="/plot/importance.png"></div>
+  <div><h3>Confusion matrix</h3><img class="plot" src="/plot/confusion.png"></div></div></div>
+
+<div class="card"><h2>2 · Regression (yield prediction)</h2>
+ <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
+ <div class="stat"><div class="v">{{r2}}</div><div class="l">R² (t/ha)</div></div>
+ <div class="stat"><div class="v">{{r2n}}</div><div class="l">R² (per-crop normalised)</div></div>
+ <div class="stat"><div class="v">{{mae}}</div><div class="l">MAE (t/ha)</div></div>
+ <div class="stat"><div class="v">{{rmse}}</div><div class="l">RMSE (t/ha)</div></div></div>
+ <p class="muted" style="margin-top:10px">One polynomial (degree-3) linear regression per crop using rainfall, temperature and soil type.</p>
+ <label style="display:inline">Crop:</label> <select id="crop" style="width:auto">{% for c in crops %}<option>{{c}}</option>{% endfor %}</select>
+ <label style="display:inline;margin-left:12px">Soil:</label> <select id="soil" style="width:auto">{% for s in soils %}<option>{{s}}</option>{% endfor %}</select>
+ <div class="grid g2" style="margin-top:14px">
+  <div><h3>Rainfall vs yield (live, changes with selection)</h3><img class="plot" id="rc" src=""></div>
+  <div><h3>Yield trend by year</h3><img class="plot" id="yt" src=""></div>
+  <div><h3>Actual vs predicted (test set)</h3><img class="plot" src="/plot/reg_actual_pred.png"></div></div></div>
+
+<div class="card"><h2>3 · K-Means clustering (agro-climatic zones, k={{k}})</h2>
+ <div class="grid g2">
+  <div><h3>Elbow curve</h3><img class="plot" src="/plot/elbow.png"></div>
+  <div><h3>Clusters</h3><img class="plot" src="/plot/clusters.png"></div>
+  <div><h3>Crop mix per zone</h3><img class="plot" src="/plot/cluster_crops.png"></div>
+  <div class="scroll"><h3>Zone summary</h3><table class="tbl"><tr><th>Zone</th><th>Records</th><th>Rain mm</th><th>Temp °C</th><th>pH</th><th>Top crops</th></tr>
+  {% for k,v in clusters.items() %}<tr><td>{{v.label}}</td><td>{{v.size}}</td><td>{{v.rain}}</td><td>{{v.temp}}</td><td>{{v.ph}}</td><td style="text-align:left">{{v.top}}</td></tr>{% endfor %}</table></div></div></div>
+<script>
+function upd(){const c=document.getElementById('crop').value,s=document.getElementById('soil').value,q='?crop='+c+'&soil='+s+'&t='+Date.now();
+ document.getElementById('rc').src='/plot/reg_curve.png'+q;document.getElementById('yt').src='/plot/year_trend.png'+q}
+document.getElementById('crop').onchange=upd;document.getElementById('soil').onchange=upd;upd();
+</script>{% endblock %}

@@ -1,0 +1,45 @@
+:root{--g:#2e7d32;--gd:#1b5e20;--gl:#e8f5e9;--y:#f9a825;--bg:#f4f8f1;--tx:#233;--card:#fff}
+*{box-sizing:border-box}body{margin:0;font-family:"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--tx)}
+header{background:linear-gradient(135deg,var(--gd),var(--g));color:#fff;padding:0 24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;position:sticky;top:0;z-index:9;box-shadow:0 2px 8px #0003}
+header h1{font-size:20px;margin:14px 0}header nav{margin-left:auto;display:flex;gap:6px}
+header a{color:#fff;text-decoration:none;padding:16px 14px;border-bottom:3px solid transparent;font-weight:500}
+header a.on,header a:hover{border-color:var(--y)}
+main{max-width:1200px;margin:24px auto;padding:0 16px}
+.card{background:var(--card);border-radius:14px;padding:20px;box-shadow:0 2px 10px #0001;margin-bottom:22px}
+.card h2{margin:0 0 6px;color:var(--gd);font-size:20px}.card h3{color:var(--gd);margin:0 0 4px}
+.muted{color:#667;font-size:14px;margin:0 0 12px}
+.grid{display:grid;gap:22px}.g2{grid-template-columns:repeat(auto-fit,minmax(420px,1fr))}.g3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+label{font-weight:600;display:block;margin:14px 0 4px}
+input[type=number],select{width:100%;padding:10px;border:1px solid #bcd;border-radius:8px;font-size:16px}
+input[type=range]{width:100%;accent-color:var(--g)}
+button{background:var(--g);color:#fff;border:0;padding:13px 26px;border-radius:10px;font-size:17px;cursor:pointer;margin-top:18px;width:100%;font-weight:600}
+button:hover{background:var(--gd)}
+.best{background:linear-gradient(135deg,#fffde7,#e8f5e9);border:2px solid var(--g);border-radius:14px;padding:18px;text-align:center}
+.best .name{font-size:38px;font-weight:800;color:var(--gd)}.best small{color:#556}
+.row{display:flex;justify-content:space-between;padding:9px 12px;border-bottom:1px solid #e3e9e0}
+.row b{color:var(--gd)}
+img.plot{width:100%;border-radius:8px;display:block}
+.stat{text-align:center}.stat .v{font-size:32px;font-weight:800;color:var(--g)}.stat .l{color:#667;font-size:13px}
+table.tbl{border-collapse:collapse;width:100%;font-size:13px}.tbl th{background:var(--gl);color:var(--gd)}
+.tbl th,.tbl td{padding:6px 8px;border-bottom:1px solid #e3e9e0;text-align:right}.tbl td:first-child,.tbl th:first-child{text-align:left}
+.scroll{overflow-x:auto}
+.tag{display:inline-block;background:var(--gl);color:var(--gd);border-radius:20px;padding:3px 12px;font-size:13px;margin:2px}
+.expl{background:#fffde7;border-left:4px solid var(--y);padding:8px 12px;border-radius:6px;font-size:14px;margin-top:10px}
+.loading{opacity:.4;transition:.2s}
+footer{text-align:center;color:#778;padding:24px;font-size:13px}
+@media(max-width:560px){.g2{grid-template-columns:1fr}}
+/* live dashboard */
+.ctrl{position:sticky;top:56px;z-index:8;padding:12px 20px}.ctrl label{margin:0 0 2px}.ctrl .bestline{margin-top:8px}
+.card[id]{scroll-margin-top:190px}
+@media(max-width:900px){.ctrl{position:static}}
+.ctrlrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;align-items:end}
+.bestline{background:var(--gl);border-left:4px solid var(--g);padding:8px 12px;border-radius:6px;font-size:15px;margin-top:10px}
+.pathline{margin-top:8px;font-size:14px;line-height:2}
+.svgfull{width:100%;height:auto;display:block}
+.treebox{overflow:auto;height:560px;border:1px solid #dbe5d6;border-radius:10px;background:#fafcf9;margin-top:12px}
+button.small{width:auto;margin:0;padding:9px 16px;font-size:14px}button.alt{background:#fff;color:var(--gd);border:2px solid var(--g)}
+button.alt:hover{background:var(--gl)}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid #cfd8cc;border-radius:20px;padding:4px 12px;margin:3px;cursor:pointer;font-size:13px;background:#fff;user-select:none}
+.chip i{width:11px;height:11px;border-radius:50%;display:inline-block}.chip.off{opacity:.35;text-decoration:line-through}
+.tip{position:absolute;display:none;background:#102a12;color:#fff;padding:8px 11px;border-radius:8px;font-size:12px;line-height:1.5;pointer-events:none;z-index:99;box-shadow:0 3px 12px #0005}
+.card a{color:var(--g)}

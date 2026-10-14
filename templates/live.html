@@ -1,0 +1,64 @@
+{% extends "base.html" %}{% block body %}
+<script>window.CFG = {{ cfg|tojson }};</script>
+<script src="{{ url_for('static', filename='d3.min.js') }}"></script>
+<script src="{{ url_for('static', filename='common.js') }}"></script>
+
+<div class="card ctrl">
+ <div class="ctrlrow">
+  <div><label>🌧 Rainfall: <b id="rv">800</b> mm</label><input type="range" id="rain" min="{{rmin}}" max="{{rmax}}" value="800"></div>
+  <div><label>🌡 Temperature: <b id="tv">25</b> °C</label><input type="range" id="temp" min="{{tmin}}" max="{{tmax}}" step="0.5" value="25"></div>
+  <div><label>🪨 Soil</label><select id="soil">{% for s in soils %}<option {{ 'selected' if s=='Loamy' }}>{{s}}</option>{% endfor %}</select></div>
+ </div>
+ <div id="bestcrop" class="bestline">…</div>
+</div>
+<div class="card" id="s0"><h2>🌾 Crop recommendation</h2><div id="recbox" class="grid g2"><p class="muted">Loading…</p></div></div>
+<p class="muted" style="text-align:center">Change rainfall, temperature or soil above - the recommendation, graphs, decision tree, clusters and regression <b>all update live</b>. These controls drive <b>every</b> graph below in real time. Jump to:
+  <a href="#s1">Suitability</a> · <a href="#s2">Decision Tree</a> · <a href="#s3">K-Means</a> · <a href="#s4">Regression</a> · <a href="#s5">Explorer</a></p>
+
+<div class="card" id="s1"><h2>1 · Live crop suitability &amp; yield</h2>
+ <p class="muted">Left: Decision-Tree probability for each crop. Right: regression-predicted yield as an index (100 = that crop's average yield).</p>
+ <div class="grid g2"><div><h3>Suitability (%)</h3><svg id="bars-prob" class="svgfull"></svg></div>
+ <div><h3>Expected yield index</h3><svg id="bars-yield" class="svgfull"></svg></div></div></div>
+
+<div class="card" id="s2"><h2>2 · Live Decision Tree</h2>
+ <p class="muted">Change the depth or minimum leaf size - the tree is <b>re-trained instantly</b> on 24,000 records. The <span style="color:#d32f2f"><b>red path</b></span> shows how the tree classifies your field. Click any node to expand / collapse it, hover for details.</p>
+ <div class="ctrlrow">
+  <div><label>Max depth: <b id="tdv">4</b></label><input type="range" id="tdepth" min="1" max="12" value="4"></div>
+  <div><label>Min samples per leaf</label><select id="tleaf"><option>1</option><option>5</option><option>10</option><option selected>25</option><option>50</option><option>100</option><option>250</option></select></div>
+  <div style="display:flex;gap:8px;align-items:end"><button id="texpand" class="small">Expand more</button><button id="tcollapse" class="small alt">Collapse all</button></div>
+ </div>
+ <div id="tstats" class="bestline" style="margin-top:12px"></div>
+ <div id="tpath" class="pathline"></div>
+ <div class="treebox"><svg id="tree"></svg></div>
+ <h3 style="margin-top:16px">Feature importance (live)</h3><svg id="timp" class="svgfull" style="max-width:560px"></svg></div>
+
+<div class="card" id="s3"><h2>3 · Live K-Means clustering</h2>
+ <p class="muted">Watch K-Means work: points are re-assigned to the nearest centroid (✚) and centroids move each iteration until clusters are stable. Change <b>k</b> or the axes to re-run instantly. ★ is your field.</p>
+ <div class="ctrlrow">
+  <div><label>Clusters k: <b id="kkv">4</b></label><input type="range" id="kk" min="2" max="8" value="4"></div>
+  <div><label>X axis</label><select id="kfx"><option value="r" selected>Rainfall</option><option value="t">Temperature</option><option value="p">Soil pH</option><option value="h">Humidity</option><option value="y">Yield</option></select></div>
+  <div><label>Y axis</label><select id="kfy"><option value="r">Rainfall</option><option value="t" selected>Temperature</option><option value="p">Soil pH</option><option value="h">Humidity</option><option value="y">Yield</option></select></div>
+  <div><label>Speed</label><select id="kspeed"><option value="1200">Slow</option><option value="700" selected>Normal</option><option value="250">Fast</option></select></div>
+ </div>
+ <div style="display:flex;gap:8px;margin:12px 0"><button id="kplay" class="small">▶ Play</button><button id="kstep" class="small alt">Step ▸</button><button id="kreset" class="small alt">↻ New random start</button></div>
+ <div id="kinfo" class="bestline"></div><div id="kfield" class="pathline"></div>
+ <div class="grid g2" style="margin-top:12px"><div><svg id="kmsvg" class="svgfull"></svg></div>
+  <div><h3>Inertia per iteration (falls as clusters improve)</h3><svg id="kminertia" class="svgfull" style="max-width:420px"></svg>
+  <h3 style="margin-top:12px">Cluster profiles (live)</h3><div class="scroll" id="ktable"></div></div></div></div>
+
+<div class="card" id="s4"><h2>4 · Live Regression (yield prediction)</h2>
+ <p class="muted">Pick a crop. The black curve is the regression model; the red dot is the predicted yield for <b>your</b> current rainfall, temperature and soil - it moves as you drag the sliders at the top.</p>
+ <label style="display:inline">Crop:</label> <select id="rcrop" style="width:auto">{% for c in crops %}<option>{{c}}</option>{% endfor %}</select>
+ <div id="regpred" class="bestline" style="margin-top:12px"></div>
+ <div class="grid g2" style="margin-top:12px"><div><h3>Yield vs rainfall</h3><svg id="reg1" class="svgfull"></svg></div>
+  <div><h3>Yield vs temperature</h3><svg id="reg2" class="svgfull"></svg></div>
+  <div><h3>Yield trend by year</h3><svg id="trend" class="svgfull"></svg></div></div></div>
+
+<div class="card" id="s5"><h2>5 · Live data explorer</h2>
+ <p class="muted">Hover a point for details · scroll to zoom · drag to pan · click a crop below to hide / show it.</p>
+ <div class="ctrlrow"><div><label>X axis</label><select id="efx"><option value="r" selected>Rainfall</option><option value="t">Temperature</option><option value="p">Soil pH</option><option value="h">Humidity</option><option value="y">Yield</option></select></div>
+  <div><label>Y axis</label><select id="efy"><option value="r">Rainfall</option><option value="t" selected>Temperature</option><option value="p">Soil pH</option><option value="h">Humidity</option><option value="y">Yield</option></select></div></div>
+ <div id="elegend" style="margin:12px 0"></div><svg id="exsvg" class="svgfull" style="max-width:900px;background:#fafcf9;border-radius:8px"></svg></div>
+<div id="tip" class="tip"></div>
+<script src="{{ url_for('static', filename='live.js') }}"></script>
+{% endblock %}
